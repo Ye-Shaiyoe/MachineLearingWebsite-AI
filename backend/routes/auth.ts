@@ -125,10 +125,16 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
 // Get current user
 router.get('/me', verifyToken, async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    console.log('Finding user with userId:', req.userId, 'type:', typeof req.userId)
     const user = await User.findByPk(req.userId, {
       attributes: ['id', 'username', 'email']
     })
+    console.log('User found:', user ? `id=${user.id}, username=${user.username}` : 'null')
+    
     if (!user) {
+      // Try to find all users as fallback for debugging
+      const allUsers = await User.findAll({ attributes: ['id', 'username', 'email'] })
+      console.log('All users in database:', allUsers.length, allUsers.map(u => ({ id: u.id, username: u.username })))
       throw createError(404, 'User not found')
     }
     res.json({ success: true, user })
