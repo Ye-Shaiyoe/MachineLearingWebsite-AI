@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Roleplay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --bg2: #141418;
+    --bg3: #1a1a20;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --text1: #f0ede8;
+    --text: #f0ede8;
+    --text2: #9b9793;
+    --text3: #5a5754;
+    --accent: #c9a96e;
+    --accent2: #8b6d42;
+    --accent-glow: rgba(201,169,110,0.15);
+    --user-bubble: #1e1e28;
+    --ai-bubble: #16161e;
+    --danger: #c25050;
+    --success: #5a9e6e;
+    --radius: 12px;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  #root { display: flex; height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    width: 300px;
+    min-width: 300px;
+    background: var(--bg2);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+
+  .sidebar-header {
+    padding: 24px 20px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .logo span {
+    color: var(--text2);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .sidebar-section {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 10px;
+  }
+
+  .api-input-wrap {
+    position: relative;
+  }
+
+  .api-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 36px 10px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .api-input::placeholder { color: var(--text3); }
+  .api-input:focus { border-color: var(--accent2); }
+
+  .eye-btn {
+    position: absolute;
+    right: 10px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none;
+    color: var(--text3); cursor: pointer;
+    font-size: 14px; padding: 2px;
+    transition: color 0.2s;
+  }
+  .eye-btn:hover { color: var(--accent); }
+
+  .api-status {
+    display: flex; align-items: center; gap: 6px;
+    margin-top: 6px; font-size: 11px;
+  }
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+  .dot.ok { background: var(--success); }
+  .dot.no { background: var(--text3); }
+  .dot.err { background: var(--danger); }
+
+  /* Model selector */
+  .model-select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%235a5754' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    transition: border-color 0.2s;
+  }
+  .model-select:focus { border-color: var(--accent2); }
+  .model-select option { background: #1a1a20; }
+
+  /* Personality panel */
+  .personality-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 20px;
+  }
+
+  .persona-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .persona-card:hover { border-color: var(--border2); }
+  .persona-card.active {
+    border-color: var(--accent2);
+    background: rgba(201,169,110,0.05);
+  }
+
+  .persona-image-thumb {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid var(--border2);
+  }
+
+  .persona-card-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .persona-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 3px;
+  }
+  .persona-desc {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .persona-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    background: var(--accent-glow);
+    color: var(--accent);
+    border: 1px solid var(--accent2);
+    margin-top: 6px;
+  }
+
+  .persona-delete {
+    position: absolute; right: 8px; top: 8px;
+    background: none; border: none;
+    color: var(--text3); cursor: pointer;
+    font-size: 14px; padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+    z-index: 10;
+  }
+  .persona-delete:hover { color: var(--danger); background: rgba(194,80,80,0.1); }
+
+  .add-persona-btn {
+    width: 100%;
+    background: none;
+    border: 1px dashed var(--border2);
+    border-radius: var(--radius);
+    padding: 10px;
+    color: var(--text3);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .add-persona-btn:hover { border-color: var(--accent2); color: var(--accent); }
+
+  /* MAIN CHAT */
+  .main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .chat-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg2);
+  }
+
+  .chat-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-style: italic;
+    color: var(--text);
+  }
+
+  .chat-subtitle {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 1px;
+  }
+
+  .header-actions {
+    display: flex; gap: 8px;
+  }
+
+  .icon-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text2);
+    padding: 6px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .icon-btn:hover { border-color: var(--border2); color: var(--text); }
+  .icon-btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* MESSAGES */
+  .messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .message {
+    display: flex;
+    gap: 12px;
+    max-width: 72%;
+    animation: msgIn 0.25s ease;
+  }
+  @keyframes msgIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+  }
+
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500;
+    flex-shrink: 0;
+    border: 1px solid var(--border2);
+    overflow: hidden;
+  }
+
+  .avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .avatar.ai-av {
+    background: linear-gradient(135deg, #2a2a1a, #1a1a2a);
+    color: var(--accent);
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+  }
+
+  .avatar.user-av {
+    background: var(--bg3);
+    color: var(--text2);
+  }
+
+  .bubble {
+    padding: 12px 16px;
+    border-radius: 14px;
+    font-size: 14px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .message.ai .bubble {
+    background: var(--ai-bubble);
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--text);
+  }
+
+  .message.user .bubble {
+    background: var(--user-bubble);
+    border: 1px solid var(--border2);
+    border-top-right-radius: 4px;
+    color: var(--text);
+  }
+
+  .bubble-meta {
+    font-size: 10px;
+    color: var(--text3);
+    margin-top: 5px;
+    font-style: italic;
+  }
+
+  /* typing indicator */
+  .typing-dots {
+    display: flex; gap: 4px; align-items: center;
+    padding: 4px 0;
+  }
+  .typing-dots span {
+    width: 5px; height: 5px;
+    background: var(--accent2);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dots span:nth-child(2) { animation-delay: 0.15s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes bounce {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-5px); }
+  }
+
+  /* empty state */
+  .empty-state {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 12px;
+    color: var(--text3);
+    padding: 40px;
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    font-family: 'Playfair Display', serif;
+    color: var(--accent2);
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--text2);
+    font-style: italic;
+  }
+
+  .empty-sub {
+    font-size: 13px;
+    color: var(--text3);
+    max-width: 300px;
+    line-height: 1.6;
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--bg2);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .msg-textarea {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    outline: none;
+    resize: none;
+    min-height: 44px;
+    max-height: 140px;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+    overflow-y: auto;
+  }
+  .msg-textarea::placeholder { color: var(--text3); }
+  .msg-textarea:focus { border-color: var(--accent2); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    color: #0d0d0f;
+    font-size: 16px;
+    flex-shrink: 0;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .send-btn:hover { background: #d9b97e; }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 100;
+    backdrop-filter: blur(4px);
+    padding: 20px;
+  }
+
+  .modal {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 16px;
+    padding: 28px;
+    width: 100%;
+    max-width: 460px;
+    animation: modalIn 0.2s ease;
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: scale(0.96) translateY(8px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  .modal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .field {
+    margin-bottom: 16px;
+  }
+
+  .field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+  }
+
+  .field input, .field textarea, .field select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+  .field input:focus, .field textarea:focus { border-color: var(--accent2); }
+  .field textarea { min-height: 80px; line-height: 1.6; }
+  .field input::placeholder, .field textarea::placeholder { color: var(--text3); }
+
+  .modal-actions {
+    display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px;
+  }
+
+  .btn-ghost {
+    background: none;
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    color: var(--text2);
+    padding: 9px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+    color: var(--text2);
+    padding: 9px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-ghost:hover { border-color: var(--border); color: var(--text); }
+
+  .btn-primary {
+    background: var(--accent);
+    border: none;
+    border-radius: 8px;
+    color: #0d0d0f;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: #d9b97e; }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 200;
+    animation: toastIn 0.25s ease;
+    max-width: 280px;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* PRIMARY TEXT COLOR */
+  --primary: #4a90e2;
+
+  /* sidebar toggle for mobile */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 12px; left: 12px;
+    z-index: 50;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text2);
+    font-size: 16px;
+  }
+
+  /* slider */
+  .slider-wrap {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .slider-wrap input[type=range] {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border2);
+    outline: none;
+    border: none;
+    padding: 0;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 12px; color: var(--accent);
+    min-width: 28px; text-align: right;
+  }
+
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100vh;
+      z-index: 40;
+      transform: translateX(-100%);
+    }
+    .sidebar.open {
+      transform: translateX(0);
+    }
+    .main {
+      width: 100%;
+    }
+    .sidebar-toggle {
+      display: flex;
+    }
+  }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+</html>
+
+  /* toast */
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-size: 13px;
+    color: var(--text);
+    z-index: 200;
+    animation: toastIn 0.25s ease;
+    max-width: 280px;
+  }
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .toast.success { border-color: var(--success); color: var(--success); }
+  .toast.error { border-color: var(--danger); color: var(--danger); }
+
+  /* sidebar toggle for mobile */
+  .sidebar-toggle {
+    display: none;
+    position: fixed;
+    top: 12px; left: 12px;
+    z-index: 50;
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    width: 36px; height: 36px;
+    align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text2);
+    font-size: 16px;
+  }
+
+  /* slider */
+  .slider-wrap {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .slider-wrap input[type=range] {
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--border2);
+    outline: none;
+    border: none;
+    padding: 0;
+  }
+  .slider-wrap input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+  }
+  .slider-val {
+    font-size: 12px; color: var(--accent);
+    min-width: 28px; text-align: right;
+  }
+
+  /* SESSIONS */
+  .sessions-panel {
+    padding: 12px 20px 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .sessions-list {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .session-item {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    font-size: 13px;
+    color: var(--text2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .session-item:hover { border-color: var(--border2); }
+
+  .session-item.active {
+    border-color: var(--accent2);
+    background: rgba(201,169,110,0.05);
+    color: var(--text);
+  }
+
+  .session-name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .session-actions {
+    display: flex;
+    gap: 4px;
+    margin-left: 8px;
+  }
+
+  .session-btn {
+    background: none;
+    border: none;
+    color: var(--text3);
+    cursor: pointer;
+    font-size: 12px;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: color 0.2s;
+  }
+
+  .session-btn:hover { color: var(--text); }
+  .session-btn.danger:hover { color: var(--danger); }
+
+  .new-session-btn {
+    width: 100%;
+    background: none;
+    border: 1px dashed var(--border2);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--text3);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+
+  .new-session-btn:hover { border-color: var(--accent2); color: var(--accent); }
+
+  @media (max-width: 700px) {
+    .sidebar {
+      position: fixed; inset: 0; right: auto;
+      z-index: 40;
+      transform: translateX(-100%);
+      width: 280px;
+    }
+    .sidebar.open { transform: translateX(0); }
+    .sidebar-toggle { display: flex; }
+    .main { width: 100%; }
+    .message { max-width: 90%; }
+    .messages-area { padding: 16px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback } = React;
+
+const DEFAULT_PERSONAS = [
+  {
+    id: 1,
+    name: "Arya",
+    tag: "Sahabat Akrab",
+    description: "Teman ngobrol yang asik, santai, dan suka bercanda. Pakai bahasa gaul sehari-hari.",
+    systemPrompt: "Kamu adalah Arya, sahabat dekat user yang asik dan santai. Kamu suka bercanda, pakai bahasa gaul, dan selalu supportif. Sering pakai kata 'wkwk', 'bro', 'gils', dsb. Hindari jadi terlalu formal.",
+    profileImage: null
+  },
+  {
+    id: 2,
+    name: "Professor Elara",
+    tag: "Mentor Bijak",
+    description: "Akademisi berpengalaman yang elegan, penuh pengetahuan, dan suka filosofi mendalam.",
+    systemPrompt: "Kamu adalah Professor Elara, seorang akademisi berpengalaman yang elegan dan berwibawa. Kamu berbicara dengan terstruktur, kaya akan analogi dan referensi intelektual. Kamu menghargai pertanyaan mendalam dan selalu memberikan perspektif yang luas.",
+    profileImage: null
+  },
+  {
+    id: 3,
+    name: "Kai",
+    tag: "Rival Serius",
+    description: "Rival yang selalu menantang dan kompetitif, tapi sebenarnya peduli.",
+    systemPrompt: "Kamu adalah Kai, rival user yang kompetitif dan sedikit sombong, tapi sebenarnya peduli. Kamu sering menantang pendapat user, suka debat, tapi selalu fair. Kamu mengakui keunggulan orang lain walau dengan enggan.",
+    profileImage: null
+  }
+];
+
+const MODELS = [
+  { value: "x-ai/grok-4.1-fast", label: "Grok-4.1 Fast" },
+  { value: "x-ai/grok-3", label: "Grok-3" },
+  { value: "x-ai/grok-3-mini", label: "Grok-3 Mini" },
+  { value: "x-ai/grok-2-1212", label: "Grok-2" },
+  { value: "x-ai/grok-beta", label: "Grok Beta" },
+];
+
+function Toast({ msg, type, onDone }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 2800);
+    return () => clearTimeout(t);
+  }, []);
+  return <div className={`toast ${type}`}>{msg}</div>;
+}
+
+function PersonaModal({ onSave, onClose, editing }) {
+  const [name, setName] = useState(editing?.name || "");
+  const [tag, setTag] = useState(editing?.tag || "");
+  const [desc, setDesc] = useState(editing?.description || "");
+  const [prompt, setPrompt] = useState(editing?.systemPrompt || "");
+  const [profileImage, setProfileImage] = useState(editing?.profileImage || null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        setProfileImage(evt.target?.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setProfileImage(null);
+  };
+
+  const save = () => {
+    if (!name.trim() || !prompt.trim()) return;
+    onSave({ id: editing?.id || Date.now(), name, tag, description: desc, systemPrompt: prompt, profileImage });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal">
+        <div className="modal-title">{editing ? "Edit Persona" : "Buat Persona Baru"}</div>
+        <div className="field">
+          <label>Nama Karakter</label>
+          <input value={name} onChange={e => setName(e.target.value)} placeholder="Contoh: Luna, Sensei, etc." />
+        </div>
+        <div className="field">
+          <label>Tag / Label</label>
+          <input value={tag} onChange={e => setTag(e.target.value)} placeholder="Contoh: Sahabat, Mentor, dll." />
+        </div>
+        <div className="field">
+          <label>Deskripsi Singkat</label>
+          <input value={desc} onChange={e => setDesc(e.target.value)} placeholder="Gambaran singkat tentang karakter ini..." />
+        </div>
+        <div className="field">
+          <label>Foto Profile Karakter</label>
+          <div style={{ display: "flex", gap: "10px", alignItems: "flex-start" }}>
+            <div style={{ flex: 1 }}>
+              <input type="file" accept="image/*" onChange={handleImageUpload} style={{ width: "100%" }} />
+            </div>
+            {profileImage && (
+              <button
+                type="button"
+                onClick={removeImage}
+                style={{
+                  background: "var(--danger)",
+                  border: "none",
+                  color: "white",
+                  padding: "8px 12px",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                  fontSize: "12px",
+                  fontFamily: "'DM Sans', sans-serif",
+                  flexShrink: 0
+                }}
+              >
+                Hapus
+              </button>
+            )}
+          </div>
+          {profileImage && (
+            <div style={{ marginTop: "10px" }}>
+              <img src={profileImage} alt="Preview" style={{ width: "80px", height: "80px", borderRadius: "8px", objectFit: "cover" }} />
+            </div>
+          )}
+        </div>
+        <div className="field">
+          <label>System Prompt (Kepribadian)</label>
+          <textarea
+            value={prompt}
+            onChange={e => setPrompt(e.target.value)}
+            placeholder="Instruksi kepribadian untuk AI. Contoh: Kamu adalah Luna, seorang detektif misterius yang berbicara dengan singkat dan selalu curiga..."
+            rows={5}
+          />
+        </div>
+        <div className="modal-actions">
+          <button className="btn-ghost" onClick={onClose}>Batal</button>
+          <button className="btn-primary" onClick={save} disabled={!name.trim() || !prompt.trim()}>
+            {editing ? "Simpan" : "Tambah Persona"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("or_apikey") || "");
+  const [showKey, setShowKey] = useState(false);
+  const [model, setModel] = useState("x-ai/grok-3-mini");
+  const [personas, setPersonas] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("personas")) || DEFAULT_PERSONAS; }
+    catch { return DEFAULT_PERSONAS; }
+  });
+  const [activePersona, setActivePersona] = useState(personas[0]);
+  
+  // Session management
+  const [sessions, setSessions] = useState(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("chat_sessions")) || [];
+      return saved.length > 0 ? saved : [{
+        id: Date.now(),
+        name: "Sesi 1",
+        messages: [],
+        createdAt: Date.now(),
+        personaId: personas[0]?.id
+      }];
+    } catch { return [{
+      id: Date.now(),
+      name: "Sesi 1",
+      messages: [],
+      createdAt: Date.now(),
+      personaId: personas[0]?.id
+    }]; }
+  });
+  const [activeSessionId, setActiveSessionId] = useState(() => {
+    const sessionIds = sessions.map(s => s.id);
+    return sessionIds[0] || Date.now();
+  });
+  
+  const activeSession = sessions.find(s => s.id === activeSessionId) || sessions[0];
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [temp, setTemp] = useState(0.8);
+  const [toast, setToast] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [editingPersona, setEditingPersona] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [renamingSessionId, setRenamingSessionId] = useState(null);
+  const messagesEndRef = useRef(null);
+  const textareaRef = useRef(null);
+
+  useEffect(() => { localStorage.setItem("or_apikey", apiKey); }, [apiKey]);
+  useEffect(() => { localStorage.setItem("personas", JSON.stringify(personas)); }, [personas]);
+  useEffect(() => { localStorage.setItem("chat_sessions", JSON.stringify(sessions)); }, [sessions]);
+  useEffect(() => { messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [activeSession?.messages, loading]);
+
+  const showToast = (msg, type = "info") => {
+    setToast({ msg, type });
+  };
+
+  const updateSessionMessages = (newMessages) => {
+    setSessions(prev => prev.map(s => s.id === activeSessionId ? { ...s, messages: newMessages } : s));
+  };
+
+  const createNewSession = () => {
+    const newSession = {
+      id: Date.now(),
+      name: `Sesi ${sessions.length + 1}`,
+      messages: [],
+      createdAt: Date.now(),
+      personaId: activePersona.id
+    };
+    setSessions(prev => [...prev, newSession]);
+    setActiveSessionId(newSession.id);
+    showToast("Sesi baru dibuat", "success");
+  };
+
+  const deleteSession = (id) => {
+    if (sessions.length <= 1) { showToast("Minimal satu sesi harus ada", "error"); return; }
+    const newSessions = sessions.filter(s => s.id !== id);
+    setSessions(newSessions);
+    if (activeSessionId === id) { setActiveSessionId(newSessions[0].id); }
+    showToast("Sesi dihapus", "info");
+  };
+
+  const renameSession = (id, newName) => {
+    if (!newName.trim()) return;
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, name: newName } : s));
+    setRenamingSessionId(null);
+    showToast("Sesi diperbarui", "success");
+  };
+
+  const switchSession = (id) => {
+    setActiveSessionId(id);
+    setSidebarOpen(false);
+  };
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
+    if (!apiKey.trim()) { showToast("Masukkan OpenRouter API Key dulu!", "error"); return; }
+
+    const userMsg = { role: "user", content: input.trim(), ts: Date.now() };
+    const newMessages = [...activeSession.messages, userMsg];
+    updateSessionMessages(newMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const history = newMessages.map(m => ({ role: m.role, content: m.content }));
+      const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${apiKey}`,
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "AI Roleplay"
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: activePersona.systemPrompt },
+            ...history
+          ],
+          temperature: temp,
+          max_tokens: 800
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const reply = data.choices?.[0]?.message?.content || "...";
+      updateSessionMessages([...newMessages, { role: "assistant", content: reply, ts: Date.now() }]);
+    } catch (e) {
+      showToast("Error: " + e.message, "error");
+      updateSessionMessages([...newMessages, {
+        role: "assistant",
+        content: `⚠ Gagal mendapatkan respons: ${e.message}`,
+        ts: Date.now(),
+        isError: true
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleKey = e => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  };
+
+  const clearChat = () => { 
+    updateSessionMessages([]); 
+    showToast("Chat di sesi ini dihapus", "success"); 
+  };
+
+  const savePersona = (p) => {
+    if (editingPersona) {
+      setPersonas(prev => prev.map(x => x.id === p.id ? p : x));
+      if (activePersona.id === p.id) setActivePersona(p);
+      showToast("Persona diperbarui!", "success");
+    } else {
+      setPersonas(prev => [...prev, p]);
+      showToast("Persona baru ditambahkan!", "success");
+    }
+    setShowModal(false);
+    setEditingPersona(null);
+  };
+
+  const deletePersona = (id) => {
+    if (personas.length <= 1) { showToast("Minimal satu persona harus ada", "error"); return; }
+    const newList = personas.filter(p => p.id !== id);
+    setPersonas(newList);
+    if (activePersona.id === id) { setActivePersona(newList[0]); }
+    showToast("Persona dihapus", "info");
+  };
+
+  const switchPersona = (p) => {
+    setActivePersona(p);
+    setSidebarOpen(false);
+    showToast(`Berganti ke ${p.name}`, "success");
+  };
+
+  const initials = name => name.slice(0, 2).toUpperCase();
+
+  const apiOk = apiKey.length > 10;
+
+  return (
+    <>
+      {/* mobile sidebar toggle */}
+      <button className="sidebar-toggle" onClick={() => setSidebarOpen(o => !o)}>☰</button>
+
+      {/* sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 39, background: "rgba(0,0,0,0.4)" }}
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      <div className={`sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <div className="logo">
+            Roleplay AI
+            <span>Powered by OpenRouter · Grok</span>
+          </div>
+        </div>
+
+        {/* API KEY */}
+        <div className="sidebar-section">
+          <div className="section-label">OpenRouter API Key</div>
+          <div className="api-input-wrap">
+            <input
+              className="api-input"
+              type={showKey ? "text" : "password"}
+              value={apiKey}
+              onChange={e => setApiKey(e.target.value)}
+              placeholder="sk-or-..."
+            />
+            <button className="eye-btn" onClick={() => setShowKey(v => !v)}>
+              {showKey ? "🙈" : "👁"}
+            </button>
+          </div>
+          <div className="api-status">
+            <span className={`dot ${apiOk ? "ok" : "no"}`} />
+            <span style={{ fontSize: 11, color: "var(--text3)" }}>
+              {apiOk ? "Key tersimpan" : "Belum ada key"}
+            </span>
+          </div>
+        </div>
+
+        {/* SESSIONS */}
+        <div className="sessions-panel">
+          <div className="section-label">Riwayat Chat</div>
+        </div>
+        <div style={{ padding: "0 20px 12px" }}>
+          <div className="sessions-list">
+            {sessions.map(s => (
+              <div
+                key={s.id}
+                className={`session-item ${activeSessionId === s.id ? "active" : ""}`}
+                onClick={() => switchSession(s.id)}
+              >
+                <div className="session-name">
+                  {renamingSessionId === s.id ? (
+                    <input
+                      autoFocus
+                      type="text"
+                      defaultValue={s.name}
+                      onBlur={e => renameSession(s.id, e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === "Enter") renameSession(s.id, e.target.value);
+                        if (e.key === "Escape") setRenamingSessionId(null);
+                      }}
+                      onClick={e => e.stopPropagation()}
+                      style={{
+                        background: "var(--bg)",
+                        border: "1px solid var(--accent2)",
+                        borderRadius: "4px",
+                        padding: "2px 6px",
+                        color: "var(--text)",
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: "12px",
+                        outline: "none",
+                        width: "100%"
+                      }}
+                    />
+                  ) : (
+                    s.name
+                  )}
+                </div>
+                {activeSessionId === s.id && (
+                  <div className="session-actions">
+                    <button
+                      className="session-btn"
+                      onClick={e => { e.stopPropagation(); setRenamingSessionId(s.id); }}
+                      title="Rename"
+                    >✎</button>
+                    <button
+                      className="session-btn danger"
+                      onClick={e => { e.stopPropagation(); deleteSession(s.id); }}
+                      title="Delete"
+                    >✕</button>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          <button className="new-session-btn" onClick={createNewSession}>
+            + Sesi Baru
+          </button>
+        </div>
+
+        {/* MODEL */}
+        <div className="sidebar-section">
+          <div className="section-label">Model</div>
+          <select className="model-select" value={model} onChange={e => setModel(e.target.value)}>
+            {MODELS.map(m => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
+          </select>
+          <div style={{ marginTop: 14 }}>
+            <div className="section-label">Kreativitas (Temperature)</div>
+            <div className="slider-wrap">
+              <input
+                type="range" min="0" max="1" step="0.1"
+                value={temp} onChange={e => setTemp(parseFloat(e.target.value))}
+              />
+              <span className="slider-val">{temp.toFixed(1)}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* PERSONAS */}
+        <div style={{ padding: "12px 20px 8px", borderBottom: "1px solid var(--border)" }}>
+          <div className="section-label">Pilih Persona</div>
+        </div>
+        <div className="personality-scroll">
+          {personas.map(p => (
+            <div
+              key={p.id}
+              className={`persona-card ${activePersona.id === p.id ? "active" : ""}`}
+              onClick={() => switchPersona(p)}
+            >
+              {p.profileImage && <img src={p.profileImage} alt={p.name} className="persona-image-thumb" />}
+              <div className="persona-card-content">
+                <button
+                  className="persona-delete"
+                  onClick={e => { e.stopPropagation(); deletePersona(p.id); }}
+                  title="Hapus persona"
+                >✕</button>
+                <div className="persona-name">{p.name}</div>
+                <div className="persona-desc">{p.description}</div>
+                {p.tag && <span className="persona-badge">{p.tag}</span>}
+                {activePersona.id === p.id && (
+                  <button
+                    style={{ display: "block", background: "none", border: "none", color: "var(--accent2)", fontSize: 11, cursor: "pointer", marginTop: 6, padding: 0, fontFamily: "DM Sans, sans-serif" }}
+                    onClick={e => { e.stopPropagation(); setEditingPersona(p); setShowModal(true); }}
+                  >
+                    ✏ Edit persona ini
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+          <button className="add-persona-btn" onClick={() => { setEditingPersona(null); setShowModal(true); }}>
+            + Buat Persona Baru
+          </button>
+        </div>
+      </div>
+
+      {/* MAIN */}
+      <div className="main">
+        <div className="chat-header">
+          <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+            {activePersona.profileImage && (
+              <img
+                src={activePersona.profileImage}
+                alt={activePersona.name}
+                style={{ width: "40px", height: "40px", borderRadius: "8px", objectFit: "cover", border: "1px solid var(--border2)" }}
+              />
+            )}
+            <div>
+              <div className="chat-title">{activePersona.name}</div>
+              <div className="chat-subtitle">{activePersona.tag || "AI Character"} · {MODELS.find(m => m.value === model)?.label}</div>
+            </div>
+          </div>
+          <div className="header-actions">
+            <button className="icon-btn danger" onClick={clearChat}>🗑 Hapus Chat</button>
+          </div>
+        </div>
+
+        <div className="messages-area">
+          {activeSession.messages.length === 0 && !loading ? (
+            <div className="empty-state">
+              <div className="empty-icon">✦</div>
+              <div className="empty-title">Mulai percakapan dengan {activePersona.name}</div>
+              <div className="empty-sub">{activePersona.description}</div>
+            </div>
+          ) : (
+            <>
+              {activeSession.messages.map((m, i) => (
+                <div key={i} className={`message ${m.role === "user" ? "user" : "ai"}`}>
+                  <div className={`avatar ${m.role === "user" ? "user-av" : "ai-av"}`}>
+                    {m.role === "assistant" && activePersona.profileImage ? (
+                      <img src={activePersona.profileImage} alt={activePersona.name} />
+                    ) : (
+                      m.role === "user" ? "U" : initials(activePersona.name)
+                    )}
+                  </div>
+                  <div>
+                    <div className="bubble" style={m.isError ? { color: "var(--danger)" } : {}}>
+                      {m.content}
+                    </div>
+                    <div className="bubble-meta">
+                      {m.role === "assistant" ? activePersona.name : "Kamu"} ·{" "}
+                      {new Date(m.ts).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {loading && (
+                <div className="message ai">
+                  <div className="avatar ai-av">
+                    {activePersona.profileImage ? (
+                      <img src={activePersona.profileImage} alt={activePersona.name} />
+                    ) : (
+                      initials(activePersona.name)
+                    )}
+                  </div>
+                  <div className="bubble">
+                    <div className="typing-dots">
+                      <span /><span /><span />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+
+        <div className="input-area">
+          <textarea
+            ref={textareaRef}
+            className="msg-textarea"
+            value={input}
+            onChange={e => {
+              setInput(e.target.value);
+              e.target.style.height = "auto";
+              e.target.style.height = Math.min(e.target.scrollHeight, 140) + "px";
+            }}
+            onKeyDown={handleKey}
+            placeholder={`Kirim pesan ke ${activePersona.name}... (Enter untuk kirim)`}
+            rows={1}
+          />
+          <button className="send-btn" onClick={sendMessage} disabled={loading || !input.trim()}>
+            ➤
+          </button>
+        </div>
+      </div>
+
+      {/* MODAL */}
+      {showModal && (
+        <PersonaModal
+          editing={editingPersona}
+          onSave={savePersona}
+          onClose={() => { setShowModal(false); setEditingPersona(null); }}
+        />
+      )}
+
+      {/* TOAST */}
+      {toast && <Toast msg={toast.msg} type={toast.type} onDone={() => setToast(null)} />}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
