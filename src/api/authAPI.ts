@@ -1,11 +1,38 @@
-import axios from 'axios'
+import axios, { AxiosInstance } from 'axios'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
-const api = axios.create({
+const api: AxiosInstance = axios.create({
   baseURL: API_URL,
   withCredentials: true
 })
+
+// Add token to requests - BEFORE any requests are made
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token')
+  if (token) {
+    console.log('Adding token to request:', config.url)
+    config.headers.Authorization = `Bearer ${token}`
+  } else {
+    console.log('No token found in localStorage for:', config.url)
+  }
+  return config
+}, (error) => {
+  console.error('Request interceptor error:', error)
+  return Promise.reject(error)
+})
+
+// Handle response errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      console.log('401 Unauthorized - clearing token')
+      localStorage.removeItem('token')
+    }
+    return Promise.reject(error)
+  }
+)
 
 export interface User {
   id: string
