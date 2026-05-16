@@ -1,4 +1,4 @@
-# AI Roleplay Chat with Auth 
+# AI Roleplay Chat with Auth  
 
 Modern React + TypeScript + Vite application untuk chat dengan AI character yang bisa dikustomisasi, dilengkapi dengan sistem autentikasi lengkap.
 
