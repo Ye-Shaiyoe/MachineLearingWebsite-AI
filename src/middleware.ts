@@ -1,7 +1,12 @@
 import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
-const publicPages = new Set(["/login", "/register"]);
+const publicPages = new Set([
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+]);
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -20,7 +25,7 @@ export function middleware(request: NextRequest) {
   }
 
   if (sessionCookie && isPublicPage) {
-    return NextResponse.redirect(new URL("/", request.url));
+    return NextResponse.redirect(new URL("/dashboard", request.url));
   }
 
   return NextResponse.next();

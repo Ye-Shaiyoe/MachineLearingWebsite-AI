@@ -20,6 +20,9 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     minPasswordLength: 8,
+    sendResetPassword: async ({ user, url }) => {
+      console.log(`[AUTH] Reset password requested for ${user.email}. URL: ${url}`);
+    },
   },
   session: {
     cookieCache: {

@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { authClient } from "@/lib/auth/client";
 import { resetPasswordSchema } from "@/lib/auth/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,9 +35,19 @@ export function ResetPasswordForm() {
     setPending(true);
 
     try {
-      // Backend call placeholder (frontend only for now)
-      // When email provider is configured, call authClient endpoint:
-      // await authClient.resetPassword({ newPassword: parsed.data.password, token: token ?? "" });
+      const res = await authClient.$fetch<{ status?: boolean }>("/reset-password", {
+        method: "POST",
+        body: {
+          newPassword: parsed.data.password,
+          token: token ?? "",
+        },
+      });
+
+      if (res.error) {
+        setError(res.error.message ?? "Failed to reset password. The link may have expired.");
+        return;
+      }
+
       setSuccess(true);
     } catch {
       setError("Failed to reset password. The link may have expired.");
@@ -47,9 +58,9 @@ export function ResetPasswordForm() {
 
   if (!token && !success) {
     return (
-      <div className="flex w-full max-w-sm flex-col gap-5">
+      <div className="flex w-full flex-col gap-5">
         <div className="space-y-1">
-          <h1 className="font-serif text-3xl tracking-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
             Invalid reset link
           </h1>
           <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
@@ -60,7 +71,7 @@ export function ResetPasswordForm() {
         <div className="pt-2">
           <Link
             href="/forgot-password"
-            className="inline-flex h-10 items-center justify-center border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
+            className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
           >
             Request new link
           </Link>
@@ -71,9 +82,9 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="flex w-full max-w-sm flex-col gap-5">
+      <div className="flex w-full flex-col gap-5">
         <div className="space-y-1">
-          <h1 className="font-serif text-3xl tracking-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
             Password updated
           </h1>
           <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
@@ -84,7 +95,7 @@ export function ResetPasswordForm() {
         <div className="pt-2">
           <Link
             href="/login"
-            className="inline-flex h-10 items-center justify-center bg-[var(--accent)] px-4 text-sm font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--accent-hover)]"
+            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--accent-hover)]"
           >
             Sign in
           </Link>
@@ -94,9 +105,9 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
       <div className="space-y-1">
-        <h1 className="font-serif text-3xl tracking-tight">
+        <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
           Set new password
         </h1>
         <p className="text-sm text-[var(--ink-muted)]">

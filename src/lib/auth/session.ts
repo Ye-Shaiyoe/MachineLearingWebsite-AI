@@ -36,6 +36,6 @@ export async function requireSession(): Promise<AppSession> {
 export async function requireGuest(): Promise<void> {
   const session = await getServerSession();
   if (session) {
-    redirect("/");
+    redirect("/dashboard");
   }
 }

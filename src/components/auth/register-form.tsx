@@ -44,14 +44,14 @@ export function RegisterForm() {
       return;
     }
 
-    router.push("/");
+    router.push("/dashboard");
     router.refresh();
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
       <div className="space-y-1">
-        <h1 className="font-serif text-3xl tracking-tight">
+        <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
           Create account
         </h1>
         <p className="text-sm text-[var(--ink-muted)]">

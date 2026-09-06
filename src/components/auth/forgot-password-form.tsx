@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
+import { authClient } from "@/lib/auth/client";
 import { forgotPasswordSchema } from "@/lib/auth/schemas";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,9 +30,19 @@ export function ForgotPasswordForm() {
     setPending(true);
 
     try {
-      // Backend call placeholder (frontend only for now)
-      // When email provider is configured, call authClient endpoint:
-      // await authClient.requestPasswordReset({ email: parsed.data.email, redirectTo: "/reset-password" });
+      const res = await authClient.$fetch<{ status?: boolean; message?: string }>("/request-password-reset", {
+        method: "POST",
+        body: {
+          email: parsed.data.email,
+          redirectTo: "/reset-password",
+        },
+      });
+
+      if (res.error) {
+        setError(res.error.message ?? "Could not send reset instructions.");
+        return;
+      }
+
       setSubmittedEmail(parsed.data.email);
     } catch {
       setError("Unable to process request. Please try again later.");
@@ -42,13 +53,13 @@ export function ForgotPasswordForm() {
 
   if (submittedEmail) {
     return (
-      <div className="flex w-full max-w-sm flex-col gap-5">
+      <div className="flex w-full flex-col gap-5">
         <div className="space-y-1">
-          <h1 className="font-serif text-3xl tracking-tight">
+          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
             Check your email
           </h1>
           <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            If an account exists for <span className="text-[var(--ink)]">{submittedEmail}</span>,
+            If an account exists for <span className="font-medium text-[var(--ink)]">{submittedEmail}</span>,
             we have sent instructions to reset your password.
           </p>
         </div>
@@ -56,7 +67,7 @@ export function ForgotPasswordForm() {
         <div className="pt-2">
           <Link
             href="/login"
-            className="inline-flex h-10 items-center justify-center border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
+            className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
           >
             Return to sign in
           </Link>
@@ -66,9 +77,9 @@ export function ForgotPasswordForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-5">
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
       <div className="space-y-1">
-        <h1 className="font-serif text-3xl tracking-tight">
+        <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
           Reset password
         </h1>
         <p className="text-sm text-[var(--ink-muted)]">
