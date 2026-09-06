@@ -3,19 +3,20 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-2 text-sm font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper)] disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-neutral-900 text-neutral-50 hover:bg-neutral-800",
+        default:
+          "bg-[var(--accent)] text-[var(--on-accent)] hover:bg-[var(--accent-hover)]",
         outline:
-          "border border-neutral-200 bg-transparent hover:bg-neutral-100 dark:border-neutral-800",
-        ghost: "hover:bg-neutral-100 dark:hover:bg-neutral-900",
+          "border border-[var(--rule)] bg-transparent text-[var(--ink)] hover:border-[var(--ink)]",
+        ghost: "text-[var(--ink-muted)] hover:text-[var(--ink)]",
       },
       size: {
-        default: "h-9 px-4 py-2",
-        sm: "h-8 px-3",
-        lg: "h-10 px-6",
+        default: "h-10 px-4",
+        sm: "h-8 px-3 text-xs",
+        lg: "h-11 px-5",
       },
     },
     defaultVariants: {

@@ -12,12 +12,20 @@ const env = getServerEnv();
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
   baseURL: env.BETTER_AUTH_URL,
+  trustedOrigins: [env.BETTER_AUTH_URL],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema,
   }),
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 8,
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 5,
+    },
   },
   plugins: [nextCookies()],
 });
