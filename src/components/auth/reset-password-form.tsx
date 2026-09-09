@@ -5,9 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { authClient } from "@/lib/auth/client";
 import { resetPasswordSchema } from "@/lib/auth/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export function ResetPasswordForm() {
   const searchParams = useSearchParams();
@@ -58,22 +55,22 @@ export function ResetPasswordForm() {
 
   if (!token && !success) {
     return (
-      <div className="flex w-full flex-col gap-5">
-        <div className="space-y-1">
-          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
-            Invalid reset link
-          </h1>
-          <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            This password reset link is missing a valid token or has expired.
+      <div className="flex w-full flex-col gap-6">
+        <div className="space-y-1.5">
+          <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-white">
+            Invalid Token
+          </h2>
+          <p className="text-sm leading-relaxed text-slate-300">
+            This password reset authorization link is missing a valid token or has expired.
           </p>
         </div>
 
         <div className="pt-2">
           <Link
             href="/forgot-password"
-            className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
+            className="flex h-11 w-full items-center justify-center rounded-xl bg-white text-slate-950 font-mono text-sm font-bold shadow-lg transition-all hover:bg-slate-200"
           >
-            Request new link
+            Request New Reset Token
           </Link>
         </div>
       </div>
@@ -82,22 +79,22 @@ export function ResetPasswordForm() {
 
   if (success) {
     return (
-      <div className="flex w-full flex-col gap-5">
-        <div className="space-y-1">
-          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
-            Password updated
-          </h1>
-          <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            Your password has been changed. You can now sign in with your new password.
+      <div className="flex w-full flex-col gap-6">
+        <div className="space-y-1.5">
+          <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-white">
+            Password Updated
+          </h2>
+          <p className="text-sm leading-relaxed text-slate-300">
+            Your cryptographic credentials have been refreshed. You can now authenticate your session.
           </p>
         </div>
 
         <div className="pt-2">
           <Link
             href="/login"
-            className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-medium text-[var(--on-accent)] transition-colors hover:bg-[var(--accent-hover)]"
+            className="flex h-11 w-full items-center justify-center rounded-xl bg-emerald-400 text-slate-950 font-mono text-sm font-bold shadow-lg transition-all hover:bg-emerald-300"
           >
-            Sign in
+            Authenticate Session →
           </Link>
         </div>
       </div>
@@ -105,51 +102,76 @@ export function ResetPasswordForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
-      <div className="space-y-1">
-        <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
-          Set new password
-        </h1>
-        <p className="text-sm text-[var(--ink-muted)]">
+    <form onSubmit={onSubmit} className="flex w-full flex-col gap-4">
+      <div className="space-y-1.5">
+        <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-white">
+          Set New Password
+        </h2>
+        <p className="text-sm text-slate-300 font-sans leading-relaxed">
           Must be at least eight characters.
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="password">New password</Label>
-        <Input
+      <div className="space-y-1.5">
+        <label
+          htmlFor="password"
+          className="block font-mono text-xs uppercase tracking-wider text-slate-300 font-medium"
+        >
+          New Password
+        </label>
+        <input
           id="password"
           name="password"
           type="password"
           autoComplete="new-password"
+          placeholder="••••••••••••"
           required
+          className="w-full rounded-xl border border-white/20 bg-black/60 px-4 py-2.5 font-mono text-sm text-white placeholder:text-slate-500 outline-none transition-colors focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="confirmPassword">Confirm password</Label>
-        <Input
+      <div className="space-y-1.5">
+        <label
+          htmlFor="confirmPassword"
+          className="block font-mono text-xs uppercase tracking-wider text-slate-300 font-medium"
+        >
+          Confirm New Password
+        </label>
+        <input
           id="confirmPassword"
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
+          placeholder="••••••••••••"
           required
+          className="w-full rounded-xl border border-white/20 bg-black/60 px-4 py-2.5 font-mono text-sm text-white placeholder:text-slate-500 outline-none transition-colors focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
         />
       </div>
 
       {error ? (
-        <p className="text-sm text-[#8a3b2b]" role="alert">
+        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-2.5 font-mono text-xs text-rose-300" role="alert">
           {error}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Updating password…" : "Update password"}
-      </Button>
+      <button
+        type="submit"
+        disabled={pending}
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 py-3 font-mono text-sm font-bold text-slate-950 shadow-lg transition-all hover:bg-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {pending ? (
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
+        ) : (
+          <span>Commit Password Update →</span>
+        )}
+      </button>
 
-      <p className="text-sm text-[var(--ink-muted)]">
+      <p className="text-center text-xs text-slate-300 pt-1">
         Remembered your password?{" "}
-        <Link href="/login" className="text-[var(--ink)] underline underline-offset-4">
+        <Link
+          href="/login"
+          className="font-mono font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-4"
+        >
           Sign in
         </Link>
       </p>

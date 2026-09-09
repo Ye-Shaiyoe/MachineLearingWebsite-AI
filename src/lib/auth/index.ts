@@ -24,6 +24,16 @@ export const auth = betterAuth({
       console.log(`[AUTH] Reset password requested for ${user.email}. URL: ${url}`);
     },
   },
+  socialProviders: {
+    ...(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET
+      ? {
+          google: {
+            clientId: env.GOOGLE_CLIENT_ID,
+            clientSecret: env.GOOGLE_CLIENT_SECRET,
+          },
+        }
+      : {}),
+  },
   session: {
     cookieCache: {
       enabled: true,

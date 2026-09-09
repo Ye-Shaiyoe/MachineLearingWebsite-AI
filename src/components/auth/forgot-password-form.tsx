@@ -4,9 +4,6 @@ import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { authClient } from "@/lib/auth/client";
 import { forgotPasswordSchema } from "@/lib/auth/schemas";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 export function ForgotPasswordForm() {
   const [error, setError] = useState<string | null>(null);
@@ -53,23 +50,23 @@ export function ForgotPasswordForm() {
 
   if (submittedEmail) {
     return (
-      <div className="flex w-full flex-col gap-5">
-        <div className="space-y-1">
-          <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
-            Check your email
-          </h1>
-          <p className="text-sm leading-relaxed text-[var(--ink-muted)]">
-            If an account exists for <span className="font-medium text-[var(--ink)]">{submittedEmail}</span>,
-            we have sent instructions to reset your password.
+      <div className="flex w-full flex-col gap-6">
+        <div className="space-y-1.5">
+          <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-white">
+            Dispatch Sent
+          </h2>
+          <p className="text-sm leading-relaxed text-slate-300">
+            If an account exists for <span className="font-mono font-semibold text-white">{submittedEmail}</span>,
+            we have transmitted secure instructions to reset your password.
           </p>
         </div>
 
         <div className="pt-2">
           <Link
             href="/login"
-            className="inline-flex h-10 w-full items-center justify-center rounded-lg border border-[var(--rule)] bg-transparent px-4 text-sm font-medium text-[var(--ink)] transition-colors hover:border-[var(--ink)]"
+            className="flex h-11 w-full items-center justify-center rounded-xl bg-white text-slate-950 font-mono text-sm font-bold shadow-lg transition-all hover:bg-slate-200"
           >
-            Return to sign in
+            ← Return to Sign In
           </Link>
         </div>
       </div>
@@ -78,39 +75,57 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex w-full flex-col gap-5">
-      <div className="space-y-1">
-        <h1 className="font-serif text-2xl sm:text-3xl tracking-tight">
-          Reset password
-        </h1>
-        <p className="text-sm text-[var(--ink-muted)]">
-          Enter your email to receive a password reset link.
+      <div className="space-y-1.5">
+        <h2 className="font-serif text-2xl sm:text-3xl font-medium tracking-tight text-white">
+          Reset Password
+        </h2>
+        <p className="text-sm text-slate-300 font-sans leading-relaxed">
+          Enter your registered email address to receive password reset instructions.
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
-        <Input
+      <div className="space-y-1.5">
+        <label
+          htmlFor="email"
+          className="block font-mono text-xs uppercase tracking-wider text-slate-300 font-medium"
+        >
+          Email Address
+        </label>
+        <input
           id="email"
           name="email"
           type="email"
           autoComplete="email"
+          placeholder="operator@orbital.network"
           required
+          className="w-full rounded-xl border border-white/20 bg-black/60 px-4 py-2.5 font-mono text-sm text-white placeholder:text-slate-500 outline-none transition-colors focus:border-emerald-400 focus:ring-1 focus:ring-emerald-400"
         />
       </div>
 
       {error ? (
-        <p className="text-sm text-[#8a3b2b]" role="alert">
+        <p className="rounded-lg border border-rose-500/30 bg-rose-500/10 p-2.5 font-mono text-xs text-rose-300" role="alert">
           {error}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={pending}>
-        {pending ? "Sending link…" : "Send reset link"}
-      </Button>
+      <button
+        type="submit"
+        disabled={pending}
+        className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-400 py-3 font-mono text-sm font-bold text-slate-950 shadow-lg transition-all hover:bg-emerald-300 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        {pending ? (
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-slate-950 border-t-transparent" />
+        ) : (
+          <span>Transmit Reset Link →</span>
+        )}
+      </button>
 
-      <p className="text-sm text-[var(--ink-muted)]">
+      <p className="text-center text-xs text-slate-300 pt-1">
         Remembered your password?{" "}
-        <Link href="/login" className="text-[var(--ink)] underline underline-offset-4">
+        <Link
+          href="/login"
+          className="font-mono font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-4"
+        >
           Sign in
         </Link>
       </p>
