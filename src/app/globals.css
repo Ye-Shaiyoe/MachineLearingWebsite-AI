@@ -37,3 +37,129 @@ body {
   color: var(--ink);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* ═══════════════════════════════════════════════════════
+   Dashboard Shell — Astrometric Galaxy Dark Mode
+   ═══════════════════════════════════════════════════════ */
+
+.dashboard-shell {
+  --ds-bg: #030508;
+  --ds-surface: #06080e;
+  --ds-surface-2: #0a0e18;
+  --ds-surface-3: #0f1420;
+  --ds-border: rgba(255, 255, 255, 0.08);
+  --ds-border-hover: rgba(255, 255, 255, 0.16);
+  --ds-text: #f8fafc;
+  --ds-text-muted: #8b9ab5;
+  --ds-text-dim: #4a5568;
+  --ds-accent: #34d399;
+  --ds-accent-hover: #6ee7b7;
+  --ds-accent-bg: rgba(52, 211, 153, 0.1);
+  --ds-cyan: #22d3ee;
+  --ds-cyan-bg: rgba(34, 211, 238, 0.1);
+  --ds-purple: #a78bfa;
+  --ds-purple-bg: rgba(167, 139, 250, 0.1);
+  --ds-amber: #fbbf24;
+  --ds-amber-bg: rgba(251, 191, 36, 0.1);
+  --ds-rose: #fb7185;
+  --ds-rose-bg: rgba(251, 113, 133, 0.1);
+
+  background: var(--ds-bg);
+  color: var(--ds-text);
+}
+
+/* Glass card */
+.ds-glass {
+  background: rgba(6, 8, 14, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--ds-border);
+}
+
+.ds-glass:hover {
+  border-color: var(--ds-border-hover);
+}
+
+/* Glass card — lighter variant */
+.ds-glass-light {
+  background: rgba(15, 20, 32, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--ds-border);
+}
+
+/* Sidebar nav item */
+.ds-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.625rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--ds-text-muted);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  position: relative;
+}
+
+.ds-nav-item:hover {
+  color: var(--ds-text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.ds-nav-item.active {
+  color: var(--ds-text);
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(34, 211, 238, 0.08));
+}
+
+.ds-nav-item.active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  border-radius: 0 2px 2px 0;
+  background: var(--ds-accent);
+}
+
+/* Scrollbar styling for dashboard */
+.dashboard-shell ::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dashboard-shell ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dashboard-shell ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.dashboard-shell ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Stat gauge */
+.stat-gauge-ring {
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s ease-out;
+}
+
+/* Prompt input glow */
+.prompt-glow {
+  box-shadow: 0 0 0 1px var(--ds-border),
+              0 0 20px rgba(52, 211, 153, 0.05),
+              0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: box-shadow 0.3s ease;
+}
+
+.prompt-glow:focus-within {
+  box-shadow: 0 0 0 1px rgba(52, 211, 153, 0.3),
+              0 0 30px rgba(52, 211, 153, 0.1),
+              0 4px 20px rgba(0, 0, 0, 0.3);
+}
