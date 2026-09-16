@@ -15,7 +15,7 @@ export default async function AppLayout({
     <SessionProvider user={user}>
       <div className="dashboard-shell flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <DashboardSidebar />
+        <DashboardSidebar user={user} />
 
         {/* Main area — offset by sidebar width */}
         <div className="ml-56 flex flex-1 flex-col overflow-hidden">

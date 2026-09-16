@@ -9,9 +9,11 @@ import {
   FolderOpen,
   Bot,
   Clock,
-  Settings,
   Sparkles,
 } from "lucide-react";
+import type { AuthUser } from "@/types/auth";
+import { LocalMusicPlayer } from "./local-music-player";
+import { SettingsNavItem } from "./settings-nav-item";
 
 const navItems = [
   { label: "Beranda", href: "/dashboard", icon: LayoutDashboard },
@@ -20,10 +22,9 @@ const navItems = [
   { label: "File & Dokumen", href: "/files", icon: FolderOpen },
   { label: "Agen AI", href: "/agents", icon: Bot },
   { label: "Riwayat", href: "/history", icon: Clock },
-  { label: "Pengaturan", href: "/settings", icon: Settings },
 ];
 
-export function DashboardSidebar() {
+export function DashboardSidebar({ user }: { user: AuthUser }) {
   const pathname = usePathname();
 
   return (
@@ -62,7 +63,11 @@ export function DashboardSidebar() {
             </Link>
           );
         })}
+        <SettingsNavItem user={user} />
       </nav>
+
+      {/* Local player */}
+      <LocalMusicPlayer />
 
       {/* Bottom section */}
       <div className="border-t border-[var(--ds-border)] px-4 py-4">
