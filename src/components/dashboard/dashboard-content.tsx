@@ -166,13 +166,13 @@ export function DashboardContent({ user }: { user: AuthUser }) {
             <div className="relative z-10 flex h-full flex-col justify-end p-6" style={{ minHeight: 220 }}>
               <div className="max-w-sm">
                 <h1 className="font-serif text-2xl font-semibold tracking-tight text-white sm:text-3xl">
-                  Selamat datang, {user.name}! 👋
+                  Selamat datang, {user.name}
                 </h1>
                 <p className="mt-1.5 text-sm leading-relaxed text-white/70">
                   Ide apa yang ingin kamu wujudkan hari ini?
                 </p>
                 <p className="mt-0.5 text-xs text-white/50">
-                  Aku di sini untuk membantu, kapan pun, di mana pun. ✦
+                  Ruang kerja personal untuk ide, analisis, dan eksekusi.
                 </p>
               </div>
             </div>
@@ -189,7 +189,7 @@ export function DashboardContent({ user }: { user: AuthUser }) {
             <Sparkles className="h-5 w-5 shrink-0 text-[var(--ds-text-dim)]" />
             <input
               type="text"
-              placeholder="Tulis perintah atau pertanyaan..."
+              placeholder="Tulis Perintah atau Pertanyaan..."
               className="flex-1 bg-transparent text-sm text-[var(--ds-text)] placeholder:text-[var(--ds-text-dim)] focus:outline-none"
             />
             <button
@@ -206,7 +206,7 @@ export function DashboardContent({ user }: { user: AuthUser }) {
               <button
                 key={action.label}
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full border border-[var(--ds-border)] bg-[var(--ds-surface-2)] px-4 py-2 text-xs font-medium text-[var(--ds-text-muted)] transition-all hover:border-[var(--ds-accent)]/30 hover:text-[var(--ds-text)]"
+                className="inline-flex items-center gap-2 rounded-lg border border-[var(--ds-border)] bg-[var(--ds-surface-2)] px-3.5 py-2 text-xs font-medium text-[var(--ds-text-muted)] transition-all hover:border-[var(--ds-accent)]/30 hover:bg-[var(--ds-surface-3)] hover:text-[var(--ds-text)]"
               >
                 <action.icon className="h-3.5 w-3.5" />
                 {action.label}
@@ -243,7 +243,7 @@ export function DashboardContent({ user }: { user: AuthUser }) {
             <div className="ds-glass rounded-xl p-5">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 text-sm font-semibold text-[var(--ds-text)]">
-                  <span className="text-base">📋</span> Riwayat Terbaru
+                  Riwayat Terbaru
                 </h2>
                 <button
                   type="button"
