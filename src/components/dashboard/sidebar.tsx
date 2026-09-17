@@ -1,31 +1,32 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   MessageSquare,
-  Wand2,
-  FolderOpen,
-  Bot,
   Clock,
   Sparkles,
+  Plus,
 } from "lucide-react";
 import type { AuthUser } from "@/types/auth";
 import { LocalMusicPlayer } from "./local-music-player";
-import { SettingsNavItem } from "./settings-nav-item";
+import { SavedNavItem } from "./saved-nav-item";
 
 const navItems = [
   { label: "Beranda", href: "/dashboard", icon: LayoutDashboard },
   { label: "Chat", href: "/chat", icon: MessageSquare },
-  { label: "Generator", href: "/generator", icon: Wand2 },
-  { label: "File & Dokumen", href: "/files", icon: FolderOpen },
-  { label: "Agen AI", href: "/agents", icon: Bot },
   { label: "Riwayat", href: "/history", icon: Clock },
 ];
 
 export function DashboardSidebar({ user }: { user: AuthUser }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  function startNewChat() {
+    router.push("/chat");
+    window.dispatchEvent(new Event("nyieai:new-chat"));
+  }
 
   return (
     <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-[var(--ds-border)] bg-[var(--ds-surface)]">
@@ -44,8 +45,16 @@ export function DashboardSidebar({ user }: { user: AuthUser }) {
         </div>
       </div>
 
+      {/* New conversation */}
+      <div className="px-3">
+        <button type="button" onClick={startNewChat} className="flex w-full items-center justify-center gap-2 border border-[var(--ds-accent)]/30 bg-[var(--ds-accent)]/[0.08] px-3 py-2.5 text-xs font-medium text-[var(--ds-accent)] transition-colors hover:bg-[var(--ds-accent)]/[0.14]">
+          <Plus className="h-4 w-4" />
+          Obrolan baru
+        </button>
+      </div>
+
       {/* Navigation */}
-      <nav className="mt-2 flex flex-1 flex-col gap-0.5 px-3">
+      <nav className="mt-3 flex flex-1 flex-col gap-0.5 px-3">
         {navItems.map((item) => {
           const isActive =
             item.href === "/dashboard"
@@ -63,7 +72,7 @@ export function DashboardSidebar({ user }: { user: AuthUser }) {
             </Link>
           );
         })}
-        <SettingsNavItem user={user} />
+        <SavedNavItem user={user} />
       </nav>
 
       {/* Local player */}
