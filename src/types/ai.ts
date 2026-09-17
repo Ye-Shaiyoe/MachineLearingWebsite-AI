@@ -1,7 +1,8 @@
 export const CHAT_MODELS = [
-  "stealth/ox-alpha",
-  "minimax/minimax-m3:free",
-  "x-ai/grok-4.3",
+  "deepseek/deepseek-v4.1-flash",
+  "qwen/qwen-2.5-7b-instruct",
+  "qwen/qwen3-235b-a22b",
+  "z-ai/glm-5.2:free",
 ] as const;
 
 export type ChatModelId = (typeof CHAT_MODELS)[number];
@@ -10,9 +11,8 @@ export const IMAGE_MODELS = ["x-ai/grok-imagine-image-quality"] as const;
 
 export type ImageModelId = (typeof IMAGE_MODELS)[number];
 
-export const DEFAULT_CHAT_MODEL: ChatModelId = "stealth/ox-alpha";
-export const DEFAULT_IMAGE_MODEL: ImageModelId =
-  "x-ai/grok-imagine-image-quality";
+export const DEFAULT_CHAT_MODEL: ChatModelId = "deepseek/deepseek-v4.1-flash";
+export const DEFAULT_IMAGE_MODEL: ImageModelId = "x-ai/grok-imagine-image-quality";
 
 export function isChatModelId(value: string): value is ChatModelId {
   return (CHAT_MODELS as readonly string[]).includes(value);
