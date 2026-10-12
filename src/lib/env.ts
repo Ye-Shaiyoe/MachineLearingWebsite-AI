@@ -16,7 +16,10 @@ const requiredEnvSchema = z.object({
 });
 
 const openRouterEnvSchema = z.object({
-  OPENROUTER_API_KEY: z.string().min(1, "OPENROUTER_API_KEY is required"),
+  OPENROUTER_API_KEY: z.string().optional(),
+  LLM_API_BASE_URL: z.string().url().optional(),
+  LLM_API_KEY: z.string().optional(),
+  HF_TOKEN: z.string().optional(),
 });
 
 const r2EnvSchema = z.object({
