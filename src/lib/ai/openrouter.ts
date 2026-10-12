@@ -2,7 +2,25 @@ import "server-only";
 
 import { AppError } from "@/utils/errors";
 
-const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
+const DEFAULT_BASE_URL = "https://openrouter.ai/api/v1";
+
+export function getLLMBaseUrl(): string {
+  const custom = process.env.LLM_API_BASE_URL?.trim();
+  if (custom) {
+    // Strip trailing slash if present
+    return custom.replace(/\/+$/, "");
+  }
+  return DEFAULT_BASE_URL;
+}
+
+export function getLLMApiKey(): string {
+  return (
+    process.env.LLM_API_KEY?.trim() ||
+    process.env.OPENROUTER_API_KEY?.trim() ||
+    process.env.HF_TOKEN?.trim() ||
+    "dummy-local-key"
+  );
+}
 
 export interface OpenRouterChatMessage {
   role: "system" | "user" | "assistant" | "tool";
@@ -58,14 +76,24 @@ export async function openRouterRequest(
   body: unknown,
   init?: { stream?: boolean },
 ): Promise<Response> {
-  const response = await fetch(`${OPENROUTER_BASE_URL}${path}`, {
+  const baseUrl = getLLMBaseUrl();
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (apiKey && apiKey !== "dummy-local-key") {
+    headers["Authorization"] = `Bearer ${apiKey}`;
+  }
+
+  // Send OpenRouter metadata if hitting OpenRouter
+  if (baseUrl.includes("openrouter.ai")) {
+    headers["HTTP-Referer"] = process.env.BETTER_AUTH_URL ?? "http://localhost:3000";
+    headers["X-Title"] = "AI Chat";
+  }
+
+  const response = await fetch(`${baseUrl}${path}`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
-      "X-Title": "AI Chat",
-    },
+    headers,
     body: JSON.stringify(body),
   });
 
