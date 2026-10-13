@@ -8,7 +8,7 @@ import {
   type ChatCompletionRequest,
 } from "@/types/ai";
 import { AppError } from "@/utils/errors";
-import { openRouterChatCompletion } from "./openrouter";
+import { getLLMApiKey, openRouterChatCompletion } from "./openrouter";
 
 function assertChatRequest(input: ChatCompletionRequest): ChatCompletionRequest {
   if (!isChatModelId(input.model)) {
@@ -82,16 +82,30 @@ export async function* streamChatCompletion(
   input: ChatCompletionRequest,
 ): AsyncGenerator<ChatCompletionDelta> {
   const request = assertChatRequest(input);
-  const { OPENROUTER_API_KEY } = getOpenRouterEnv();
+  const apiKey = getLLMApiKey();
 
-  const response = await openRouterChatCompletion(OPENROUTER_API_KEY, {
-    model: request.model,
-    messages: request.messages.map((message) => ({
+  const formattedMessages: Array<{ role: "system" | "user" | "assistant" | "tool"; content: string }> = [];
+
+  // Inject user-defined personality as a system prompt if provided
+  if (request.personality && request.personality.trim()) {
+    formattedMessages.push({
+      role: "system",
+      content: request.personality.trim(),
+    });
+  }
+
+  for (const message of request.messages) {
+    formattedMessages.push({
       role: message.role,
       content: message.content,
-    })),
+    });
+  }
+
+  const response = await openRouterChatCompletion(apiKey, {
+    model: request.model,
+    messages: formattedMessages,
     stream: true,
-    temperature: request.temperature,
+    temperature: request.temperature ?? 0.7,
   });
 
   if (!response.body) {
