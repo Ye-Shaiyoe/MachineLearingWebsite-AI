@@ -30,8 +30,15 @@ export async function generateImage(
     });
   }
 
-  const { OPENROUTER_API_KEY } = getOpenRouterEnv();
-  const image = await openRouterGenerateImage(OPENROUTER_API_KEY, {
+  const apiKey = process.env.OPENROUTER_API_KEY || process.env.LLM_API_KEY;
+  if (!apiKey) {
+    throw new AppError("OPENROUTER_API_KEY or LLM_API_KEY is required for image generation.", {
+      status: 500,
+      code: "api_key_missing",
+    });
+  }
+
+  const image = await openRouterGenerateImage(apiKey, {
     model,
     prompt,
     aspect_ratio: input.aspectRatio,

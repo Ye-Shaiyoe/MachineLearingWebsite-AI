@@ -24,8 +24,13 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as { model?: unknown; messages?: unknown };
+    const body = (await request.json()) as {
+      model?: unknown;
+      messages?: unknown;
+      personality?: unknown;
+    };
     const messages = Array.isArray(body.messages) ? body.messages.filter(isChatMessage) : [];
+    const personality = typeof body.personality === "string" ? body.personality.slice(0, 4000) : undefined;
 
     const model = body.model;
     if (!isChatModel(model)) {
@@ -45,6 +50,7 @@ export async function POST(request: Request) {
           for await (const delta of streamChatCompletion({
             model,
             messages,
+            personality,
             temperature: 0.7,
           })) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify(delta)}\n\n`));
